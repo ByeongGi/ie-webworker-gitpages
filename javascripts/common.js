@@ -4,7 +4,27 @@
 
     var Util = {};
 
-
+    Util.createObjectURLBlob = function(blob) {
+        var
+              type = blob.type
+            , data_URI_header
+        ;
+        if (type === null) {
+            type = "application/octet-stream";
+        }
+        
+            data_URI_header = "data:" + type;
+            if (blob.encoding === "base64") {
+                return data_URI_header + ";base64," + blob.data;
+            } else if (blob.encoding === "URI") {
+                return data_URI_header + "," + decodeURIComponent(blob.data);
+            } if (btoa) {
+                return data_URI_header + ";base64," + btoa(blob.data);
+            } else {
+                return data_URI_header + "," + encodeURIComponent(blob.data);
+            }
+         
+    };
 
     Util.initWorkerFallback = function initWebWoker(){
         // URL.createObjectURL를 사용하기 위해서 
@@ -25,7 +45,7 @@
         }
     
     
-        var worker = new Worker(URL.createObjectURL(blob)); // IE 10 에서 에러 발생 
+        var worker = new Worker(Util.createObjectURLBlob(blob)); // IE 10 에서 에러 발생 
         console.log('worker on');
         
         worker.onmessage = function(e) { 
